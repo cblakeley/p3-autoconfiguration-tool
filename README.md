@@ -1,5 +1,8 @@
 # p3-404-check
 A JS library for checking the availability of the Platform URI and creating all the required resources.
+
+NOTE: jQuery must be loaded before this library.
+
 Usage:
 
     P3Check.initP3Platform("http://myp3.example.org:8181/platform","http://myp3.example.org/sparql");
