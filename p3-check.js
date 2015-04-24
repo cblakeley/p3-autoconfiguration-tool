@@ -9,6 +9,7 @@ function P3Check() {
 	this.uirContainer = "";
 	this.tfrContainer = "";
 	this.trContainer = "";
+	this.dcrContainer = "";
 	
 	if(typeof jQuery === 'undefined') {
 		console.error("You must include jQuery before this library.");
@@ -40,11 +41,15 @@ P3Check.prototype.initP3Platform = function (platformURI, sparqlEndpoint) {
 												url: platformURI,
 												headers: { 'Content-Type': 'text/turtle' },
 												data: '<> a <http://www.w3.org/ns/ldp#BasicContainer> ; ' +
+														'<http://www.w3.org/2000/01/rdf-schema#label> "P3 Platform"@en ; ' +
+														'<http://www.w3.org/2000/01/rdf-schema#comment> "An instance of the P3 platform"@en ; ' +
+														'<http://www.w3.org/2003/06/sw-vocab-status/ns#term_status> "unstable" ;' +
 														'<http://purl.org/dc/terms/title> "Platform Configuration" ; ' + 
-														'<http://vocab.fusepool.info/platform#sparqlEndpoint> <' + sparqlEndpoint + '> ; ' + 
-														'<http://vocab.fusepool.info/platform#userInteractionRegistry> <' + platformURI + '/uir> ; ' + 
-														'<http://vocab.fusepool.info/platform#transformerFactoryRegistry> <' + platformURI + '/tfr> ; ' + 
-														'<http://vocab.fusepool.info/platform#transformerRegistry> <' + platformURI + '/tr> . ',
+														'<http://vocab.fusepool.info/fp3#sparqlEndpoint> <' + sparqlEndpoint + '> ; ' + 
+														'<http://vocab.fusepool.info/fp3#userInteractionRegistry> <' + platformURI + '/uir> ; ' + 
+														'<http://vocab.fusepool.info/fp3#transformerFactoryRegistry> <' + platformURI + '/tfr> ; ' + 
+														'<http://vocab.fusepool.info/fp3#transformerRegistry> <' + platformURI + '/tr> ; ' +
+														'<http://vocab.fusepool.info/fp3#dashboardConfigRegistry> <' + platformURI + '/dcr> . ',
 												async: false
 											});
 											
@@ -52,12 +57,13 @@ P3Check.prototype.initP3Platform = function (platformURI, sparqlEndpoint) {
 				
 				console.info("Platform Configuration Resource created. (" + main.platformURI + ")");
 				
-				// 1. create a user interaction registry
+				// 1. creating a user interaction registry
 				var putUirRequest = $.ajax({	type: 'PUT',
 												url: platformURI + '/uir',
 												headers: { 'Content-Type': 'text/turtle' },
 												data: '<> a <http://www.w3.org/ns/ldp#BasicContainer> ; ' +
-														' <http://purl.org/dc/terms/title> "User Interaction Registry" . ',
+														' <http://www.w3.org/2000/01/rdf-schema#label> "Interaction Request Container"@en ; ' +
+														' <http://www.w3.org/2000/01/rdf-schema#comment> "Points to the Interaction Request Container"@en . ' ,
 												async: false
 											});
 											
@@ -65,12 +71,13 @@ P3Check.prototype.initP3Platform = function (platformURI, sparqlEndpoint) {
 					main.uirContainer = responseObj.getResponseHeader('Location');
 					console.info("User Interaction Registry created. (" + main.uirContainer + ")");
 					
-					// 2. create a transformer factory registry
+					// 2. creating a transformer factory registry
 					var putTfrRequest = $.ajax({	type: 'PUT',
 													url: platformURI + '/tfr',
 													headers: { 'Content-Type': 'text/turtle' },
 													data: '<> a <http://www.w3.org/ns/ldp#BasicContainer> ; ' +
-															' <http://purl.org/dc/terms/title> "Transformer Factory Registry" . ',
+															' <http://www.w3.org/2000/01/rdf-schema#label> "Transformer Factory Registry"@en ; ' +
+															' <http://www.w3.org/2000/01/rdf-schema#comment> "Points to the transformer factory registry"@en . ' ,
 													async: false
 												});
 												
@@ -78,19 +85,61 @@ P3Check.prototype.initP3Platform = function (platformURI, sparqlEndpoint) {
 						main.tfrContainer = responseObj.getResponseHeader('Location');
 						console.info("Transformer Factory Registry created. (" + main.tfrContainer + ")");
 						
-						// 3. create a transformer registry
+						// 3. creating a transformer registry
 						var putTrRequest = $.ajax({	type: 'PUT',
 														url: platformURI + '/tr',
 														headers: { 'Content-Type': 'text/turtle' },
 														data: '<> a <http://www.w3.org/ns/ldp#BasicContainer> ; ' +
-																' <http://purl.org/dc/terms/title> "Transformer Registry" . ',
+																' <http://www.w3.org/2000/01/rdf-schema#label> "Transformer Registry"@en ; ' +
+																' <http://www.w3.org/2000/01/rdf-schema#comment> "Points to the transformer registry"@en . ' ,
 														async: false
 													});
 						
 						putTrRequest.done(function(response, textStatus, responseObj) {							
 							main.trContainer = responseObj.getResponseHeader('Location');
 							console.info("Transformer Registry created. (" + main.trContainer + ")");
-							main.platformStatus = "new";
+						
+							// 4. creating a dashboard config registry
+							var putDcrRequest = $.ajax({	type: 'PUT',
+															url: platformURI + '/dcr',
+															headers: { 'Content-Type': 'text/turtle' },
+															data: '<> a <http://www.w3.org/ns/ldp#BasicContainer> ; ' +
+																	' <http://www.w3.org/2000/01/rdf-schema#label> "Dashboard Config Registry"@en ; ' +
+																	' <http://www.w3.org/2000/01/rdf-schema#comment> "Points to the dashboard config registry"@en . ' ,
+															async: false
+														});
+							
+							putDcrRequest.done(function(response, textStatus, responseObj) {							
+								main.dcrContainer = responseObj.getResponseHeader('Location');
+								console.info("Dashboard Config Registry created. (" + main.dcrContainer + ")");
+								
+								// 5. creating the default dashboard config
+								var createConfigRequest = $.ajax({
+									type: 'POST',
+									headers: { 
+										'Content-Type': 'text/turtle',
+										'Slug' : 'default'
+									},
+									async: false,
+									url: main.dcrContainer,
+									data: '@prefix ldp: <http://www.w3.org/ns/ldp#> . '
+										+ '@prefix dcterms: <http://purl.org/dc/terms/> .  '
+										+ '@prefix crldpc: <http://vocab.fusepool.info/crldpc#> . '
+										+ '<> a crldpc:ConfigurationRegistration ; '
+										+ '	dcterms:title "Default configuration"@en ; '
+										+ '	dcterms:description "Default dashboard configuration" ; '
+										+ '	crldpc:sparql-endpoint <' + main.sparqlEndpoint + '> ; '
+										+ '	crldpc:ir-ldpc <' + main.uirContainer + '> ; '
+										+ '	crldpc:tfr-ldpc <' + main.tfrContainer + '> ; '
+										+ '	crldpc:tr-ldpc <' + main.trContainer + '> ; '
+										+ '	crldpc:wr-ldpc <> . '
+								});
+								createConfigRequest.done(function(response, textStatus, responseObj) {
+									console.info("Default dashboard configuration created. (" + responseObj.getResponseHeader('Location') + ")");
+								
+									main.platformStatus = "new";
+								});
+							});
 						});
 					});
 				});
@@ -105,14 +154,18 @@ P3Check.prototype.initP3Platform = function (platformURI, sparqlEndpoint) {
 	
 };
 
-P3Check.prototype.registerFactory = function (factoryURI) {
+P3Check.prototype.registerFactory = function (factoryURI, title, description) {
+	
+    title = this.setDefaultValue(title, "Transformer Factory");
+    description = this.setDefaultValue(description, "Transformer Factory");
+	
 	if(this.platformStatus == "new") {
 		var postTfrRequest = $.ajax({	type: 'POST',
 										url: this.tfrContainer,
-										headers: { 'Content-Type': 'text/turtle' },
+										headers: { 'Content-Type': 'text/turtle', 'Slug' : title },
 										data: '<> a <http://vocab.fusepool.info/tfrldpc#TransformerFactoryRegistration> ; ' +
-												' <http://purl.org/dc/terms/title> "Transformer Factory" ; ' +
-												' <http://purl.org/dc/terms/description> "Transformer Factory" ; ' +
+												' <http://purl.org/dc/terms/title> "' + title + '" ; ' +
+												' <http://purl.org/dc/terms/description> "' + description + '" ; ' +
 												' <http://vocab.fusepool.info/tfrldpc#transformerFactory> <' + factoryURI + '> . ',
 										contentType: 'text/turtle'
 									});
@@ -131,14 +184,19 @@ P3Check.prototype.registerFactories = function (factoryURIs) {
 	}
 };
 
-P3Check.prototype.registerTransformer = function (transformerURI) {
+P3Check.prototype.registerTransformer = function (transformerURI, title, description) {
+	
+    title = this.setDefaultValue(title, "Transformer");
+    description = this.setDefaultValue(description, "Transformer");
+	
 	if(this.platformStatus == "new") {
 		var postTrRequest = $.ajax({	type: 'POST',
 										url: this.trContainer,
-										headers: { 'Content-Type': 'text/turtle' },
-										data: '<> a <http://www.w3.org/ns/ldp#DirectContainer> ; ' +
-												' <http://purl.org/dc/terms/title> "Transformer" ; ' +
-												' <http://vocab.fusepool.info/eldp#transformer> <' + transformerURI + '> . ',
+										headers: { 'Content-Type': 'text/turtle', 'Slug' : title },
+										data: '<> a <http://vocab.fusepool.info/trldpc#TransformerRegistration> ; ' +
+												' <http://purl.org/dc/terms/title> "' + title + '" ; ' +
+												' <http://purl.org/dc/terms/description> "' + description + '" ; ' +
+												' <http://vocab.fusepool.info/trldpc#transformer> <' + transformerURI + '> . ',
 										contentType: 'text/turtle'
 									});
 									
@@ -155,5 +213,9 @@ P3Check.prototype.registerTransformers = function (transformerURIs) {
 		}
 	}
 };
+
+P3Check.prototype.setDefaultValue = function(variable, defaultValue) {
+    return typeof variable !== 'undefined' ? variable : defaultValue;
+}
 
 var P3Check = new P3Check();
