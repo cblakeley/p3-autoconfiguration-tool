@@ -1,4 +1,5 @@
-# p3-404-check
+# p3-autoconfiguration-tool
+
 A JS library for checking the availability of the Platform URI and creating all the required resources.
 Usage:
 
