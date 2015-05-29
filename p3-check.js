@@ -163,6 +163,7 @@ P3Check.prototype.registerFactory = function (factoryURI, title, description) {
 		var postTfrRequest = $.ajax({	type: 'POST',
 										url: this.tfrContainer,
 										headers: { 'Content-Type': 'text/turtle', 'Slug' : title },
+                                        async: false,
 										data: '<> a <http://vocab.fusepool.info/tfrldpc#TransformerFactoryRegistration> ; ' +
 												' <http://purl.org/dc/terms/title> "' + title + '" ; ' +
 												' <http://purl.org/dc/terms/description> "' + description + '" ; ' +
@@ -193,6 +194,7 @@ P3Check.prototype.registerTransformer = function (transformerURI, title, descrip
 		var postTrRequest = $.ajax({	type: 'POST',
 										url: this.trContainer,
 										headers: { 'Content-Type': 'text/turtle', 'Slug' : title },
+                                        async: false,
 										data: '<> a <http://vocab.fusepool.info/trldpc#TransformerRegistration> ; ' +
 												' <http://purl.org/dc/terms/title> "' + title + '" ; ' +
 												' <http://purl.org/dc/terms/description> "' + description + '" ; ' +
@@ -216,6 +218,15 @@ P3Check.prototype.registerTransformers = function (transformerURIs) {
 
 P3Check.prototype.setDefaultValue = function(variable, defaultValue) {
     return typeof variable !== 'undefined' ? variable : defaultValue;
+}
+
+P3Check.prototype.configureStanbol = function(stanbolBase, platform) {
+    var getRequest = $.ajax({	type: 'GET',
+							    url: stanbolBase+"fusepool/config/?fusepool="+platform,
+                                async: false,
+                            });
+        return getRequest;
+									
 }
 
 var P3Check = new P3Check();
