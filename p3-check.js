@@ -221,8 +221,9 @@ P3Check.prototype.setDefaultValue = function(variable, defaultValue) {
 }
 
 P3Check.prototype.configureStanbol = function(stanbolBase, platform) {
-    var getRequest = $.ajax({	type: 'GET',
-							    url: stanbolBase+"fusepool/config/?fusepool="+platform,
+    var getRequest = $.ajax({	type: 'POST',
+							    url: stanbolBase+"fusepool/config/",
+                                data: { fusepool: platform },
                                 async: false,
                             });
         return getRequest;
