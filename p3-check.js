@@ -43,7 +43,7 @@ P3Check.prototype.initP3Platform = function (platformURI, sparqlEndpoint) {
                 // Create the platform resource			
                 var putPlatformRequest = $.ajax({type: 'PUT',
                     url: platformURI,
-                    headers: {'Content-Type': 'text/turtle'},
+                    headers: {'Content-Type': 'text/turtle', 'Link': "<http://www.w3.org/ns/ldp#BasicContainer>; rel='type'"},
                     data: '<> a <http://www.w3.org/ns/ldp#BasicContainer> ; ' +
                             '<http://www.w3.org/2000/01/rdf-schema#label> "P3 Platform"@en ; ' +
                             '<http://www.w3.org/2000/01/rdf-schema#comment> "An instance of the P3 platform"@en ; ' +
@@ -64,7 +64,7 @@ P3Check.prototype.initP3Platform = function (platformURI, sparqlEndpoint) {
                     // 1. creating a user interaction registry
                     var putUirRequest = $.ajax({type: 'PUT',
                         url: platformURI + '/uir',
-                        headers: {'Content-Type': 'text/turtle'},
+                        headers: {'Content-Type': 'text/turtle', 'Link': "<http://www.w3.org/ns/ldp#BasicContainer>; rel='type'"},
                         data: '<> a <http://www.w3.org/ns/ldp#BasicContainer> ; ' +
                                 ' <http://www.w3.org/2000/01/rdf-schema#label> "Interaction Request Container"@en ; ' +
                                 ' <http://www.w3.org/2000/01/rdf-schema#comment> "Points to the Interaction Request Container"@en . ',
@@ -78,7 +78,7 @@ P3Check.prototype.initP3Platform = function (platformURI, sparqlEndpoint) {
                         // 2. creating a transformer factory registry
                         var putTfrRequest = $.ajax({type: 'PUT',
                             url: platformURI + '/tfr',
-                            headers: {'Content-Type': 'text/turtle'},
+                            headers: {'Content-Type': 'text/turtle', 'Link': "<http://www.w3.org/ns/ldp#BasicContainer>; rel='type'"},
                             data: '<> a <http://www.w3.org/ns/ldp#BasicContainer> ; ' +
                                     ' <http://www.w3.org/2000/01/rdf-schema#label> "Transformer Factory Registry"@en ; ' +
                                     ' <http://www.w3.org/2000/01/rdf-schema#comment> "Points to the transformer factory registry"@en . ',
@@ -92,7 +92,7 @@ P3Check.prototype.initP3Platform = function (platformURI, sparqlEndpoint) {
                             // 3. creating a transformer registry
                             var putTrRequest = $.ajax({type: 'PUT',
                                 url: platformURI + '/tr',
-                                headers: {'Content-Type': 'text/turtle'},
+                                headers: {'Content-Type': 'text/turtle', 'Link': "<http://www.w3.org/ns/ldp#BasicContainer>; rel='type'"},
                                 data: '<> a <http://www.w3.org/ns/ldp#BasicContainer> ; ' +
                                         ' <http://www.w3.org/2000/01/rdf-schema#label> "Transformer Registry"@en ; ' +
                                         ' <http://www.w3.org/2000/01/rdf-schema#comment> "Points to the transformer registry"@en . ',
@@ -106,7 +106,7 @@ P3Check.prototype.initP3Platform = function (platformURI, sparqlEndpoint) {
                                 // 4. creating a dashboard config registry
                                 var putDcrRequest = $.ajax({type: 'PUT',
                                     url: platformURI + '/dcr',
-                                    headers: {'Content-Type': 'text/turtle'},
+                                    headers: {'Content-Type': 'text/turtle', 'Link': "<http://www.w3.org/ns/ldp#BasicContainer>; rel='type'"},
                                     data: '<> a <http://www.w3.org/ns/ldp#BasicContainer> ; ' +
                                             ' <http://www.w3.org/2000/01/rdf-schema#label> "Dashboard Config Registry"@en ; ' +
                                             ' <http://www.w3.org/2000/01/rdf-schema#comment> "Points to the dashboard config registry"@en . ',
